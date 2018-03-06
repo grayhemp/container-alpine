@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
-set -e
+#
+# Build Docker images
 
-function all() {
-    image
-}
+set -o errexit
 
 function image() {
-    docker image build --tag grayhemp/alpine .
+  docker image build --tag grayhemp/alpine .
 }
 
-if [ $# -eq 0 ]; then
-    set - all
+if [[ $# -eq 0 ]]; then
+  image
+else
+  $@
 fi
-
-$@

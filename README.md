@@ -2,7 +2,7 @@
 
 Alpine Linux Docker image.
 
-# Building
+# Build
 
 ```bash
 ./build.sh
