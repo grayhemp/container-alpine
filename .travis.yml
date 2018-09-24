@@ -3,15 +3,16 @@ services:
   - docker
 env:
   global:
-    - secure: tg4ayh7yGy3SEDl6U19xpVu2Ql6Qa5FwEx1Ey4Mi3uGPl/qTLExWlXDnkDDrdCfC19+mCH9MqvFLO+kAhZ6F/F3ZvngKLmyqZ7/JJ11nFVumMIAWsnVvmK19Icom/XqJN+t4FSD78J1MStLRXibG0siwecJgbAGdcrxNZVdRsLs88Gri3CVXRxCPbmpAq3hXvvMQJtJLEACR/uP6d69SuzK0xBn6spp31Fe7y6E+wTQ6DGAH8HxVMu9wrZLDvyYutldAXBPTLC0fN8rkNF3v3reBUWaAgL9lyzyA25xX7tMJbehRFfKmtvSFykFoVYAEhosKGpCEkE9yf1I409WxtXU/sm8+nOhOZfEgvBJMMK4/AUEUbDBbC6dE2L+Dw0CjCIc4r/CV3ToxCRrCO4J09+79SPSIuW+La5qL4eiUgFwdeNeDB+PmA9bX0RBgeAMuaFp/HxUzL7vUO557BUPa2saUAG9r/1iWSYNLFMWkWDINaOFCJKI30EVKlwpoc+iEoUvDlpBqcql41iHrnN6YmAz3vYChoCtY9hKakH4hrpTeOL6EihWFTYQ15ZoGq6NuyBXAkOIlAbckL2xwv6HyghjPmP/iaX4L6IpTLv4OK7z0Ovn2UsQ3nZXKLaQTDujLnvY5sKbDMBR7p2pbZdCkxTobYyfmC+JxlgX14NGMoMU=
     - DOCKER_REGISTRY_USERNAME='grayhemp'
+    # DOCKER_REGISTRY_PASSWORD is taken from the job settings
     - IMAGE_REPO='grayhemp'
     - IMAGE_TAG='master'
+  matrix:
 script:
-  - ./build
+  - "./build"
 deploy:
   provider: script
   script:
-    - echo "${DOCKER_REGISTRY_PASSWORD}" | ./build push
+    - echo "${DOCKER_REGISTRY_PASSWORD?}" | ./build push
   on:
     branch: master
