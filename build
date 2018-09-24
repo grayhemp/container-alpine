@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#
+# Build
+
+set -e -o pipefail
+
+: ${IMAGE_TAG:='master'}
+: ${IMAGE_REPO:="$(id -un)"}
+
+build_() {
+  docker image build --tag "${IMAGE_REPO}/alpine:${IMAGE_TAG}" .
+}
+
+build_push() {
+  trap "docker logout ${DOCKER_REGISTRY}" ERR
+
+  docker login --password-stdin -u "${DOCKER_REGISTRY_USERNAME:-$(id -un)}" \
+    "${DOCKER_REGISTRY}"
+  if [[ -n "${DOCKER_REGISTRY}" ]]; then
+    docker image tag "${IMAGE_REPO}/alpine:${IMAGE_TAG}" \
+      "${DOCKER_REGISTRY}/${IMAGE_REPO}/alpine:${IMAGE_TAG}"
+    docker image push "${DOCKER_REGISTRY}/${IMAGE_REPO}/alpine:${IMAGE_TAG}"
+  else
+    docker image push "${IMAGE_REPO}/alpine:${IMAGE_TAG}"
+  fi
+  docker logout "${DOCKER_REGISTRY}"
+}
+
+main() {
+  "build_$1" "${@:2}"
+}
+
+main "$@"
