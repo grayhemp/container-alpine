@@ -1,6 +1,8 @@
 # docker-alpine
 
-Enhanced Alpine Linux base image.
+[![Build Status](https://travis-ci.org/grayhemp/docker-alpine.svg?branch=master)](https://travis-ci.org/grayhemp/docker-alpine)
+
+Enhanced [Alpine Linux][alpine-linux] base image.
 
 ```dockerfile
 FROM grayhemp/alpine:3.8
@@ -54,3 +56,7 @@ cat password  | ./build push
 In addition to `IMAGE_REPO` and `IMAGE_TAG` shown above, optionally
 accepts `DOCKER_REGISTRY` and `DOCKER_REGISTRY_USERNAME` (current
 user) envs. The registry password is expected from `STDIN`.
+
+<!-- Links -->
+
+[alpine-linux]: https://www.alpinelinux.org
