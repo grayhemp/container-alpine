@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#
+# Compares two checksum list files made by `checksum_dir` and removes
+# unchanged files and links
+
+# Arguments:
+#   1: Checksum file
+#   2: Checksum file
+
+set -e -o pipefail
+
+comm -1 -2 "${1?}" "${2?}" | cut -d ' ' -f 3 | xargs -I {} rm {}

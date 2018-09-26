@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 #
 # Makes a list of files and links with ckecksums for a directory content
 
@@ -9,4 +9,4 @@
 
 set -e -o pipefail
 
-find "$1" -type f -o -type l | xargs -I {} cksum {} | sort
+find "${1?}" -type f -o -type l | xargs -I {} cksum {} | sort

@@ -26,6 +26,13 @@ build_push() {
   docker logout "${DOCKER_REGISTRY}"
 }
 
+build_test() {
+  docker image build \
+    --build-arg IMAGE_REPO="${IMAGE_REPO}" \
+    --build-arg IMAGE_TAG="${IMAGE_TAG}" \
+    test
+}
+
 main() {
   "build_$1" "${@:2}"
 }
