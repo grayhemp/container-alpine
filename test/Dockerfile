@@ -1,7 +1,7 @@
-ARG IMAGE_REPO
-ARG IMAGE_TAG='master'
+ARG IMAGE
+ARG TAG='master'
 
-FROM ${IMAGE_REPO}/alpine:${IMAGE_TAG}
+FROM ${IMAGE}:${TAG}
 
 RUN set -x \
   && touch /usr/local/file1 \

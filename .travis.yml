@@ -3,17 +3,15 @@ services:
   - docker
 env:
   global:
-    - DOCKER_REGISTRY_USERNAME='grayhemp'
-    # DOCKER_REGISTRY_PASSWORD is taken from the job settings
-    - IMAGE_REPO='grayhemp'
-    - IMAGE_TAG='master'
-  matrix:
+    - NAMESPACE='grayhemp'
+    # REGISTRY_PASSWORD is taken from the job settings
+    - TAG='master'
 script:
   - "./build"
   - "./build test"
 deploy:
   provider: script
   script:
-    - echo "${DOCKER_REGISTRY_PASSWORD?}" | ./build push
+    - echo "${REGISTRY_PASSWORD?}" | ./build push
   on:
     branch: master

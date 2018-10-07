@@ -1,6 +1,6 @@
 # docker-alpine
 
-[![Build Status](https://travis-ci.org/grayhemp/docker-alpine.svg?branch=master)](https://travis-ci.org/grayhemp/docker-alpine)
+[![Build Status](https://travis-ci.org/grayhemp/container-alpine.svg?branch=master)](https://travis-ci.org/grayhemp/container-alpine)
 
 Enhanced [Alpine Linux][alpine-linux] base image.
 
@@ -38,24 +38,32 @@ first one.
 This is useful for minimal images creation when only a "diff" between
 two stages is needed.
 
-## Building
+## Development
+
+Every command optionally accepts `NAMESPACE` (current user) and `TAG`
+(`master`) variables.
+
+### Building
 
 ```bash
 ./build
 ```
 
-Optionally accepts `IMAGE_REPO` (current user) and `IMAGE_TAG`
-(`master`) envs.
+### Testing
 
-## Pushing
+```bash
+./build test
+```
+
+### Pushing
 
 ```bash
 cat password  | ./build push
 ```
 
-In addition to `IMAGE_REPO` and `IMAGE_TAG` shown above, optionally
-accepts `DOCKER_REGISTRY` and `DOCKER_REGISTRY_USERNAME` (current
-user) envs. The registry password is expected from `STDIN`.
+Optionally accepts `REGISTRY` (`docker.io`) and `REGISTRY_USER`
+(current user) variables. The registry password is expected from
+`STDIN`.
 
 <!-- Links -->
 

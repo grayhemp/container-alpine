@@ -4,33 +4,32 @@
 
 set -e -o pipefail
 
-: ${IMAGE_TAG:='master'}
-: ${IMAGE_REPO:="$(id -un)"}
+: ${NAMESPACE:-"$(id -un)"}
+: ${TAG:='master'}
+
+image="$(echo ${REGISTRY} | sed 's/\/*$/\//;s/^\/$//')${NAMESPACE}/alpine"
 
 build_() {
-  docker image build --tag "${IMAGE_REPO}/alpine:${IMAGE_TAG}" .
+  local cache_from
+  for t in $(echo -e "latest\nmaster\n${TAG}" | uniq); do
+    cache_from="${cache_from} --cache-from ${image}:${t}"
+    if [[ -z "$(docker image ls -q ${image}:${t})" ]]; then
+      docker image pull "${image}:${t}" || true
+    fi
+  done
+  docker image build ${cache_from} -t "${image}:${TAG}" .
 }
 
 build_push() {
-  trap "docker logout ${DOCKER_REGISTRY}" ERR
+  : ${REGISTRY_USER:="${NAMESPACE}"}
 
-  docker login --password-stdin -u "${DOCKER_REGISTRY_USERNAME:-$(id -un)}" \
-    "${DOCKER_REGISTRY}"
-  if [[ -n "${DOCKER_REGISTRY}" ]]; then
-    docker image tag "${IMAGE_REPO}/alpine:${IMAGE_TAG}" \
-      "${DOCKER_REGISTRY}/${IMAGE_REPO}/alpine:${IMAGE_TAG}"
-    docker image push "${DOCKER_REGISTRY}/${IMAGE_REPO}/alpine:${IMAGE_TAG}"
-  else
-    docker image push "${IMAGE_REPO}/alpine:${IMAGE_TAG}"
-  fi
-  docker logout "${DOCKER_REGISTRY}"
+  trap "docker logout ${REGISTRY}" EXIT
+  docker login --password-stdin -u "${REGISTRY_USER}" "${REGISTRY}"
+  docker image push "${image}:${TAG}"
 }
 
 build_test() {
-  docker image build \
-    --build-arg IMAGE_REPO="${IMAGE_REPO}" \
-    --build-arg IMAGE_TAG="${IMAGE_TAG}" \
-    test
+  docker image build --build-arg IMAGE="${image}" --build-arg TAG="${TAG}" test
 }
 
 main() {
