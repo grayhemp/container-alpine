@@ -5,16 +5,15 @@
 Enhanced [Alpine Linux][alpine-linux] base image.
 
 ```dockerfile
-FROM grayhemp/alpine:3.8
+FROM grayhemp/alpine:latest
 ```
 
 ## Usage
 
-Along with the base image it provides a number of helper scripts
-located under the `/root/script` directory.
+Along with the base image it provides a number of helper scripts.
 
 The image also creates its `/usr/local` checksum list file using
-`checksum_dir` as `/root/alpine.crc`.
+`checksum_dir` as `/var/tmp/alpine.crc`.
 
 ### `checksum_dir`
 
@@ -40,8 +39,8 @@ two stages is needed.
 
 ## Development
 
-Every command optionally accepts `NAMESPACE` (current user) and `TAG`
-(`master`) variables.
+Every command optionally accepts `IMAGE_PATH` (current user) and
+`IMAGE_TAG` (`master`) variables.
 
 ### Building
 
@@ -61,7 +60,7 @@ Every command optionally accepts `NAMESPACE` (current user) and `TAG`
 cat password  | ./build push
 ```
 
-Optionally accepts `REGISTRY` (`docker.io`) and `REGISTRY_USER`
+Optionally accepts `REGISTRY_URL` (`docker.io`) and `REGISTRY_USER`
 (current user) variables. The registry password is expected from
 `STDIN`.
 

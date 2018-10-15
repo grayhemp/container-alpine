@@ -4,32 +4,36 @@
 
 set -e -o pipefail
 
-: ${NAMESPACE:-"$(id -un)"}
-: ${TAG:='master'}
+: ${IMAGE_PATH:="$(id -un)"}
+: ${IMAGE_TAG:='master'}
 
-image="$(echo ${REGISTRY} | sed 's/\/*$/\//;s/^\/$//')${NAMESPACE}/alpine"
+IMAGE_NAME='alpine'
+
+image_url="$(echo ${REGISTRY_URL}/${IMAGE_PATH}/${IMAGE_NAME} | sed 's/\/*$//;s/^\/*//')"
 
 build_() {
   local cache_from
-  for t in $(echo -e "latest\nmaster\n${TAG}" | uniq); do
-    cache_from="${cache_from} --cache-from ${image}:${t}"
-    if [[ -z "$(docker image ls -q ${image}:${t})" ]]; then
-      docker image pull "${image}:${t}" || true
+  for t in $(echo -e "latest\nmaster\n${IMAGE_TAG}" | uniq); do
+    cache_from="${cache_from} --cache-from ${image_url}:${t}"
+    if [[ -z "$(docker image ls -q ${image_url}:${t})" ]]; then
+      docker image pull "${image_url}:${t}" || true
     fi
   done
-  docker image build ${cache_from} -t "${image}:${TAG}" .
+  docker image build ${cache_from} -t "${image_url}:${IMAGE_TAG}" .
 }
 
 build_push() {
-  : ${REGISTRY_USER:="${NAMESPACE}"}
-
-  trap "docker logout ${REGISTRY}" EXIT
-  docker login --password-stdin -u "${REGISTRY_USER}" "${REGISTRY}"
-  docker image push "${image}:${TAG}"
+  : ${REGISTRY_USER:="${IMAGE_PATH}"}
+  trap "docker logout ${REGISTRY_URL}" EXIT
+  docker login --password-stdin -u "${REGISTRY_USER}" "${REGISTRY_URL}"
+  docker image push "${image_url}:${IMAGE_TAG}"
 }
 
 build_test() {
-  docker image build --build-arg IMAGE="${image}" --build-arg TAG="${TAG}" test
+  docker image build \
+    --build-arg IMAGE_URL="${image_url}" \
+    --build-arg IMAGE_TAG="${IMAGE_TAG}" \
+    test
 }
 
 main() {
