@@ -6,4 +6,4 @@ RUN set -x \
 
 COPY src /usr/bin
 
-RUN checksum_dir /usr/local > /var/tmp/alpine.crc
+RUN checksum_dir alpine /usr/local

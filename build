@@ -4,36 +4,44 @@
 
 set -e -o pipefail
 
-: ${IMAGE_PATH:="$(id -un)"}
-: ${IMAGE_TAG:='master'}
+: ${PROJECT:="$(id -un)"}
+: ${TAG:='master'}
 
-IMAGE_NAME='alpine'
-
-image_url="$(echo ${REGISTRY_URL}/${IMAGE_PATH}/${IMAGE_NAME} | sed 's/\/*$//;s/^\/*//')"
+repo="$([[ -n ${REGISTRY} ]] && ${REGISTRY}/ || true)${PROJECT}/alpine"
 
 build_() {
+  build_image
+}
+
+build_image() {
+  local kind
   local cache_from
-  for t in $(echo -e "latest\nmaster\n${IMAGE_TAG}" | uniq); do
-    cache_from="${cache_from} --cache-from ${image_url}:${t}"
-    if [[ -z "$(docker image ls -q ${image_url}:${t})" ]]; then
-      docker image pull "${image_url}:${t}" || true
+  kind="$([[ -n $1 ]] && echo - || true)$1"
+  for t in $(echo -e "master${kind}\n${TAG}${kind}" | uniq); do
+    cache_from="${cache_from} --cache-from ${repo}:${t}"
+    if [[ -z "$(docker image ls -q ${repo}:${t})" ]]; then
+      docker image pull "${repo}:${t}" || true
     fi
   done
-  docker image build ${cache_from} -t "${image_url}:${IMAGE_TAG}" .
+  docker image build \
+    --build-arg REPO="${repo}" \
+    --build-arg TAG="${TAG}" \
+    ${cache_from} \
+    -t "${repo}:${TAG}${kind}" "./$1"
 }
 
 build_push() {
-  : ${REGISTRY_USER:="${IMAGE_PATH}"}
-  trap "docker logout ${REGISTRY_URL}" EXIT
-  docker login --password-stdin -u "${REGISTRY_USER}" "${REGISTRY_URL}"
-  docker image push "${image_url}:${IMAGE_TAG}"
+  : ${REGISTRY_USER:="${PROJECT}"}
+  trap "docker logout ${REGISTRY}" EXIT
+  docker login --password-stdin -u "${REGISTRY_USER}" "${REGISTRY}"
+  docker image ls -q \
+    -f reference="${repo}:${TAG}*" \
+    --format '{{.Repository}}:{{.Tag}}' \
+    | xargs -I {} docker image push {}
 }
 
 build_test() {
-  docker image build \
-    --build-arg IMAGE_URL="${image_url}" \
-    --build-arg IMAGE_TAG="${IMAGE_TAG}" \
-    test
+  build_image test
 }
 
 main() {

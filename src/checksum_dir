@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 #
-# Makes a list of files and links with ckecksums for a directory content
+# Makes a list of files and links with ckecksums for a directory
+# content and saves them under a specified name
 
 # Arguments:
-#   1: Directory
-# Outputs:
-#   STDOUT: An ordered list of files and links with checksums
+#   1: Name
+#   2: Directory
 
 set -e -o pipefail
 
-find "${1?}" -type f -o -type l | xargs -I {} cksum {} | sort
+mkdir -p /var/tmp/checksum
+
+find "${2?}" -type f -o -type l \
+  | xargs -I {} cksum {} \
+  | sort > "/var/tmp/checksum/${1?}.crc"

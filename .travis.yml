@@ -3,7 +3,7 @@ services:
   - docker
 env:
   global:
-    - IMAGE_PATH='grayhemp'
+    - PROJECT='grayhemp'
     # REGISTRY_PASSWORD is taken from the job settings
     - TAG='master'
 script:

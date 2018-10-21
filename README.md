@@ -10,24 +10,25 @@ FROM grayhemp/alpine:latest
 
 ## Usage
 
-Along with the base image it provides a number of helper scripts.
-
-The image also creates its `/usr/local` checksum list file using
-`checksum_dir` as `/var/tmp/alpine.crc`.
+Along with the base image it provides `bash` by default and includes a
+number of helper scripts.
 
 ### `checksum_dir`
 
 ```bash
-checksum_dir <directory>
+checksum_dir <name> <directory>
 ```
 
 Makes a list of files and links with ckecksums for a directory
 content.
 
+This image creates its `/usr/local` checksum list file using
+`checksum_dir` by default with the name `alpine`.
+
 ### `remove_unchanged`
 
 ```bash
-remove_unchanged <checksum_file_1> <checksum_file_2>
+remove_unchanged <name_1> <name_2>
 ```
 
 Compares two checksum files made by `checksum_dir` and removes files
@@ -39,8 +40,8 @@ two stages is needed.
 
 ## Development
 
-Every command optionally accepts `IMAGE_PATH` (current user) and
-`IMAGE_TAG` (`master`) variables.
+Every command optionally accepts `PROJECT` (current userby default)
+and `TAG` (`master` by default) variables.
 
 ### Building
 
@@ -60,9 +61,8 @@ Every command optionally accepts `IMAGE_PATH` (current user) and
 cat password  | ./build push
 ```
 
-Optionally accepts `REGISTRY_URL` (`docker.io`) and `REGISTRY_USER`
-(current user) variables. The registry password is expected from
-`STDIN`.
+Optionally accepts `REGISTRY` and `REGISTRY_USER` (current user by
+default) variables. The registry password is expected from `STDIN`.
 
 <!-- Links -->
 
