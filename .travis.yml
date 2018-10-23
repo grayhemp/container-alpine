@@ -3,9 +3,9 @@ services:
   - docker
 env:
   global:
-    - PROJECT='grayhemp'
+    - REGISTRY_USER='grayhemp'
     # REGISTRY_PASSWORD is taken from the job settings
-    - TAG='master'
+    - PROJECT='grayhemp'
 script:
   - "./build"
   - "./build test"

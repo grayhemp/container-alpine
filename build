@@ -2,50 +2,51 @@
 #
 # Build
 
-set -e -o pipefail
+set -ex -o pipefail
 
-: ${PROJECT:="$(id -un)"}
+: ${REGISTRY}
+: ${PROJECT}
+: ${NAME:='alpine'}
 : ${TAG:='master'}
 
-repo="$([[ -n ${REGISTRY} ]] && ${REGISTRY}/ || true)${PROJECT}/alpine"
-
-build_() {
-  build_image
+command_all() {
+  command_image "${repo}:${TAG}" .
 }
 
-build_image() {
-  local kind
-  local cache_from
-  kind="$([[ -n $1 ]] && echo - || true)$1"
-  for t in $(echo -e "master${kind}\n${TAG}${kind}" | uniq); do
-    cache_from="${cache_from} --cache-from ${repo}:${t}"
-    if [[ -z "$(docker image ls -q ${repo}:${t})" ]]; then
-      docker image pull "${repo}:${t}" || true
-    fi
-  done
+command_image() {
+  if [[ -z "$(docker image ls -q ${1?})" ]]; then
+     docker image pull "$1" || true
+  fi
   docker image build \
     --build-arg REPO="${repo}" \
     --build-arg TAG="${TAG}" \
-    ${cache_from} \
-    -t "${repo}:${TAG}${kind}" "./$1"
+    --cache-from "$1" \
+    -t "$1" "./${2?}"
 }
 
-build_push() {
-  : ${REGISTRY_USER:="${PROJECT}"}
+command_push() {
+  : ${REGISTRY_USER:="$(id -un)"}
   trap "docker logout ${REGISTRY}" EXIT
   docker login --password-stdin -u "${REGISTRY_USER}" "${REGISTRY}"
-  docker image ls -q \
-    -f reference="${repo}:${TAG}*" \
-    --format '{{.Repository}}:{{.Tag}}' \
-    | xargs -I {} docker image push {}
+  docker image push "${repo}:${TAG}"
+  docker image push "${repo}-test:${TAG}"
 }
 
-build_test() {
-  build_image test
+command_test() {
+  command_image "${repo}-test:${TAG}" test
 }
 
 main() {
-  "build_$1" "${@:2}"
+  local registry
+  local project
+  if [[ -n ${REGISTRY} ]]; then
+    registry="${REGISTRY}/"
+  fi
+  if [[ -n ${PROJECT} ]]; then
+    project="${PROJECT}/"
+  fi
+  repo="${registry}${project}${NAME}"
+  "command_${1:-all}" "${@:2}"
 }
 
 main "$@"
