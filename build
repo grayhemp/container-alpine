@@ -4,49 +4,18 @@
 
 set -ex -o pipefail
 
-: ${REGISTRY}
-: ${PROJECT}
-: ${NAME:='alpine'}
-: ${TAG:='master'}
+source docker.sh
 
-command_all() {
-  command_image "${repo}:${TAG}" .
-}
-
-command_image() {
-  if [[ -z "$(docker image ls -q ${1?})" ]]; then
-     docker image pull "$1" || true
-  fi
-  docker image build \
-    --build-arg REPO="${repo}" \
-    --build-arg TAG="${TAG}" \
-    --cache-from "$1" \
-    -t "$1" "./${2?}"
+command_build() {
+  docker::build . 'base'
 }
 
 command_push() {
-  : ${REGISTRY_USER:="$(id -un)"}
-  trap "docker logout ${REGISTRY}" EXIT
-  docker login --password-stdin -u "${REGISTRY_USER}" "${REGISTRY}"
-  docker image push "${repo}:${TAG}"
-  docker image push "${repo}-test:${TAG}"
-}
-
-command_test() {
-  command_image "${repo}-test:${TAG}" test
+  docker::push 'base'
 }
 
 main() {
-  local registry
-  local project
-  if [[ -n ${REGISTRY} ]]; then
-    registry="${REGISTRY}/"
-  fi
-  if [[ -n ${PROJECT} ]]; then
-    project="${PROJECT}/"
-  fi
-  repo="${registry}${project}${NAME}"
-  "command_${1:-all}" "${@:2}"
+  "command_${1:-build}" "${@:2}"
 }
 
 main "$@"
