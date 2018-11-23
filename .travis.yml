@@ -1,15 +1,1 @@
-language: bash
-services:
-  - docker
-env:
-  global:
-    - REGISTRY_USER='grayhemp'
-    # REGISTRY_PASSWORD is taken from the job settings
-script:
-  - "./build"
-deploy:
-  provider: script
-  script:
-    - echo "${REGISTRY_PASSWORD?}" | ./build push
-  on:
-    branch: master
+build/travis/.travis.yml

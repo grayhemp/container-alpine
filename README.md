@@ -1,6 +1,6 @@
-# docker-base
+# container-base
 
-[![Build Status](https://travis-ci.org/grayhemp/docker-base.svg?branch=master)](https://travis-ci.org/grayhemp/docker-base)
+[![Build Status](https://travis-ci.org/grayhemp/container-base.svg?branch=master)](https://travis-ci.org/grayhemp/container-base)
 
 A minimal base image.
 
@@ -13,12 +13,12 @@ FROM grayhemp/base:latest
 
 ## Development
 
-Consult with the `build` script's code and sourced modules for
-commands and input variables.
+Consult with the `Makefile` and the `scripts` for commands and input
+variables.
 
 ```bash
-./build
-./build push < password
+make
+make push < password
 ```
 
 <!-- Links -->
