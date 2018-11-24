@@ -3,12 +3,12 @@ services:
   - docker
 env:
   global:
-    - REGISTRY_USER='grayhemp'
+    - DOCKER_REGISTRY_USER='grayhemp'
 script:
   - make
 deploy:
   provider: script
   script:
-    - echo "${REGISTRY_PASSWORD?}" | make push
+    - echo "${DOCKER_REGISTRY_PASSWORD?}" | make push
   on:
     branch: master
