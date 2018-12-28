@@ -4,23 +4,18 @@
 
 A minimal base image.
 
-Currently based on [Alpine Linux][alpine-linux]. Will be getting
-enhancements in the future.
+Based on [Alpine Linux] currently, has bash and ca-certificates
+pre-baked and planned to be getting more enhancements in the future.
+
+## Usage
 
 ```dockerfile
-FROM grayhemp/base:latest
+FROM grayhemp/base
 ```
 
 ## Development
 
-Consult with the `Makefile` and the `scripts` for commands and input
-variables.
+See [grayhemp/container-build] to get an idea of building this image.
 
-```bash
-make
-make push < password
-```
-
-<!-- Links -->
-
-[alpine-linux]: https://www.alpinelinux.org
+[Alpine Linux]: https://www.alpinelinux.org
+[grayhemp/container-build]: https://github.com/grayhemp/container-build

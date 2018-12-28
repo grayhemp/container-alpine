@@ -1,7 +1,7 @@
 .PHONY: build push
 
 build:
-	scripts/docker build build/docker 'base'
+	imgh build 'base'
 
 push:
-	scripts/docker push 'base'
+	imgh push 'base'
