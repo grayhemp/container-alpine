@@ -14,6 +14,7 @@ before_script:
       sleep 300
 script:
   - docker exec -it build make
+  - docker exec -it build make test
 deploy:
   provider: script
   script:

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+#
+# A file system check sum helper script
+
+set -x -e -o pipefail
+
+tmpdir='/var/tmp/cksumh'
+
+# Makes a list of files and links with ckecksums for a directory
+# content and saves is under a specified name
+# Arguments:
+#   1: Directory
+#   2: Check sum list name
+command_dir() {
+  local directory="${1?'Directory must be specified'}"
+  local name="${2?'Check sum list name must be specified'}"
+
+  if [[ ! -d "${tmpdir}" ]]; then
+    mkdir -p "${tmpdir}"
+    chmod 777 "${tmpdir}"
+  fi
+
+  find "${directory}" -type f -o -type l \
+    | xargs -I {} cksum {} \
+    | sort \
+    | tee > "${tmpdir}/${name}.crc"
+
+  sed -i $"\; $0;d" "${tmpdir}/${name}.crc"
+}
+
+# Compares two checksum lists by names and removes unchanged files and
+# links
+# Arguments:
+#   1: Check sum list name 1
+#   2: Check sum list name 2
+command_rm_unchanged() {
+  local name_1="${1?'Check sum list name 1 must be specified'}"
+  local name_2="${2?'Check sum list name 2 must be specified'}"
+
+  comm -1 -2 "${tmpdir}/${name_1?}.crc" "${tmpdir}/${name_2?}.crc" \
+    | cut -d ' ' -f 3 \
+    | xargs -I {} rm {}
+}
+
+main() {
+  "command_${1?Command must be specified}" "${@:2}"
+}
+
+main "$@"
